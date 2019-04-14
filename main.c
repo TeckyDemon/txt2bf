@@ -26,6 +26,10 @@ int_to_brainfuck(int difference){
 		const unsigned int number_of_ones=(unsigned int)(difference%10);
 		const unsigned int number_of_tens=(unsigned int)(difference/10);
 		char* brainfuck_code=calloc(number_of_tens+loop_body_length+number_of_ones+2,sizeof*brainfuck_code);
+		if(brainfuck_code==NULL){
+			fprintf(stderr,"Fatal: failed to allocate %zu bytes.\n",(number_of_tens+loop_body_length+number_of_ones+2)*sizeof*brainfuck_code);
+			exit(ALLOCATION_ERROR);
+		}
 		if(number_of_tens>0){
 			brainfuck_code[strlen(brainfuck_code)]='>';
 			memset(brainfuck_code+strlen(brainfuck_code),'+',number_of_tens);
@@ -52,7 +56,7 @@ generate_code(FILE* input_file,FILE* output_file){
 static inline void
 parse_args(int argc){
 	if(argc!=3){
-		puts("Usage: bfgen <input> <output>");
+		puts("Usage: bfgen <input> <output>\n");
 		exit(OTHER_ERROR);
 	}
 }
