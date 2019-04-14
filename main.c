@@ -7,7 +7,7 @@
 #define OTHER_ERROR 3
 
 static inline FILE*
-get_file_pointer(const char* filename,const char* mode){
+xfopen(const char* filename,const char* mode){
 	FILE* file_pointer=fopen(filename,mode);
 	if(file_pointer==NULL){
 		fprintf(stderr,"Error: failed to open file %s\n",filename);
@@ -15,41 +15,39 @@ get_file_pointer(const char* filename,const char* mode){
 	}
 	return file_pointer;
 }
-static inline char*
-int_to_brainfuck(int difference){
+static inline void
+emit_string(FILE* output_file,const char* string){
+	fputs(string,output_file);
+}
+static inline void
+emit_repeat(FILE* output_file,char c,int n){
+	for(int i=0;i<n;++i)
+		fputc(c,output_file);
+}
+static inline void
+emit_difference(FILE* output_file,int difference){
 	if(difference==0)
-		return ".";
+		fputc('.',output_file);
 	else{
 		char character_in_loop=difference>0?'+':'-';
 		difference=difference>0?difference:-difference;
-		const unsigned int loop_body_length=17;
-		const unsigned int number_of_ones=(unsigned int)(difference%10);
-		const unsigned int number_of_tens=(unsigned int)(difference/10);
-		char* brainfuck_code=calloc(number_of_tens+loop_body_length+number_of_ones+2,sizeof*brainfuck_code);
-		if(brainfuck_code==NULL){
-			fprintf(stderr,"Fatal: failed to allocate %zu bytes.\n",(number_of_tens+loop_body_length+number_of_ones+2)*sizeof*brainfuck_code);
-			exit(ALLOCATION_ERROR);
-		}
+		const int number_of_tens=difference/10;
 		if(number_of_tens>0){
-			brainfuck_code[strlen(brainfuck_code)]='>';
-			memset(brainfuck_code+strlen(brainfuck_code),'+',number_of_tens);
-			strcat(brainfuck_code+strlen(brainfuck_code),"[<");
-			memset(brainfuck_code+strlen(brainfuck_code),character_in_loop,10);
-			strcat(brainfuck_code+strlen(brainfuck_code),">-]<");
+			emit_string(output_file,">");
+			emit_repeat(output_file,'+',number_of_tens);
+			emit_string(output_file,"[<");
+			emit_repeat(output_file,character_in_loop,10);
+			emit_string(output_file,">-]<");
 		}
-		memset(brainfuck_code+strlen(brainfuck_code),character_in_loop,number_of_ones);
-		brainfuck_code[strlen(brainfuck_code)]='.';
-		return brainfuck_code;
+		emit_repeat(output_file,character_in_loop,difference%10);
+		fputc('.',output_file);
 	}
 }
 static inline void
 generate_code(FILE* input_file,FILE* output_file){
 	int current_char,last_char=0;
 	while((current_char=fgetc(input_file))!=EOF){
-		char* brainfuck_code=int_to_brainfuck(current_char-last_char);
-		fputs(brainfuck_code,output_file);
-		if(brainfuck_code[0]!='.')
-			free(brainfuck_code);
+		emit_difference(output_file,current_char-last_char);
 		last_char=current_char;
 	}
 }
@@ -63,8 +61,8 @@ parse_args(int argc){
 int
 main(int argc,char** argv){
 	parse_args(argc);
-	FILE* input_file=get_file_pointer(argv[1],"r");
-	FILE* output_file=get_file_pointer(argv[2],"wb");
+	FILE* input_file=xfopen(argv[1],"r");
+	FILE* output_file=xfopen(argv[2],"wb");
 	generate_code(input_file,output_file);
 	fclose(input_file);
 	fclose(output_file);
