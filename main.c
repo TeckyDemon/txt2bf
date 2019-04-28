@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #define ALLOCATION_ERROR 1
 #define FILE_ERROR 2
