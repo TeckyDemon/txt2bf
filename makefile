@@ -6,7 +6,5 @@ txt2bf: main.o
 	$(CC) $? -o txt2bf $(CFLAGS)
 %.o: %.c
 	$(CC) -c $? -o $@ $(CFLAGS)
-debug: CFLAGS+=-fsanitize=address
-debug: all
 clean:
 	$(RM) *.o
