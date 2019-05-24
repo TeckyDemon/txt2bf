@@ -23,9 +23,7 @@ Install **make** and **mingw**.
 
 ```
 git clone "https://github.com/DeBos99/txt2bf.git"
-cd txt2bf
-make
-cd ..
+make -C txt2bf
 ```
 
 ## Usage
