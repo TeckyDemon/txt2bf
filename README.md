@@ -1,5 +1,7 @@
 # TXT2BF
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 **TXT2BF** generates brainfuck code that outputs given text.
 
 ## Content
